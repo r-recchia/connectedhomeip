@@ -26,7 +26,6 @@ from optparse import OptionParser
 
 from base import BaseTestHelper, FailIfNot, TestFail, TestTimeout, logger
 
-
 WIFI_NETWORK_2 = {
     "ssid": "TestNetwork2",
     "password": "password456"
