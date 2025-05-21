@@ -94,6 +94,8 @@ class TestWiFiSwap(CHIPVirtualHome):
         servers[1]['discriminator'] = TEST_DISCRIMINATOR2
         servers[1]['nodeid'] = 2
 
+        logging.info(servers)
+
         for server in servers:
             self.execute_device_cmd(
                 server['id'],
@@ -113,13 +115,15 @@ class TestWiFiSwap(CHIPVirtualHome):
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_repl-0.0-py3-none-any.whl")))
 
         command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
-                   "{} -t 150 -a {} --paa-trust-store-path {} --discriminator {} --nodeid {}").format(
+                   "{} -t 150 -a {} --paa-trust-store-path {} --discriminator {} --nodeid {} --wifi-ssid '{}' --wifi-passphrase '{}'").format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/test/test_scripts/wifi_swap_test.py"),
             servers[0]['ip'],
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
             servers[0]['discriminator'],
-            servers[0]['nodeid'])
+            servers[0]['nodeid']),
+        servers[0]['description'][0]["ssid"],
+        servers[0]['description'][0]["password"]
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',
