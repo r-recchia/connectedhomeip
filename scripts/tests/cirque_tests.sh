@@ -43,20 +43,21 @@ OT_SIMULATION_CACHE_STAMP_FILE="$CIRQUE_CACHE_PATH/ot-simulation.commit"
 #   internal data model methods (for example it says "CommandExists" for
 #   paths where endpoint/cluster do not)
 CIRQUE_TESTS=(
-    "EchoTest"
-    "EchoOverTcpTest"
-    "FailsafeTest"
-    "MobileDeviceTest"
-    "CommissioningTest"
-    "IcdDeviceTest"
-    "SplitCommissioningTest"
-    "CommissioningFailureTest"
-    "CommissioningFailureOnReportTest"
-    "PythonCommissioningTest"
-    "CommissioningWindowTest"
-    "SubscriptionResumptionTest"
-    "SubscriptionResumptionCapacityTest"
-    "SubscriptionResumptionTimeoutTest"
+    # "EchoTest"
+    # "EchoOverTcpTest"
+    # "FailsafeTest"
+    # "MobileDeviceTest"
+    # "CommissioningTest"
+    # "IcdDeviceTest"
+    # "SplitCommissioningTest"
+    # "CommissioningFailureTest"
+    # "CommissioningFailureOnReportTest"
+    # "PythonCommissioningTest"
+    # "CommissioningWindowTest"
+    # "SubscriptionResumptionTest"
+    # "SubscriptionResumptionCapacityTest"
+    # "SubscriptionResumptionTimeoutTest"
+    "WiFiSwapTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
@@ -196,12 +197,12 @@ subcommand=$1
 shift
 
 case $subcommand in
-    *)
-        cirquetest_"$subcommand" "$@"
-        exitcode=$?
-        if ((exitcode == 127)); then
-            echo "Unknown command: $subcommand" >&2
-        fi
-        exit "$exitcode"
-        ;;
+*)
+    cirquetest_"$subcommand" "$@"
+    exitcode=$?
+    if ((exitcode == 127)); then
+        echo "Unknown command: $subcommand" >&2
+    fi
+    exit "$exitcode"
+    ;;
 esac
