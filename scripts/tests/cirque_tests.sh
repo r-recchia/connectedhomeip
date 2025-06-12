@@ -115,6 +115,11 @@ function cirquetest_cachekeyhash() {
     cirquetest_cachekey | shasum | awk '{ print $1 }'
 }
 
+function cirquetest_run_cnet_tests() {
+    echo "Running CNET tests"
+    python3 src/python_testing/cnet_test_launcher.py
+}
+
 function cirquetest_bootstrap() {
     set -ex
 
@@ -196,12 +201,12 @@ subcommand=$1
 shift
 
 case $subcommand in
-    *)
-        cirquetest_"$subcommand" "$@"
-        exitcode=$?
-        if ((exitcode == 127)); then
-            echo "Unknown command: $subcommand" >&2
-        fi
-        exit "$exitcode"
-        ;;
+*)
+    cirquetest_"$subcommand" "$@"
+    exitcode=$?
+    if ((exitcode == 127)); then
+        echo "Unknown command: $subcommand" >&2
+    fi
+    exit "$exitcode"
+    ;;
 esac
