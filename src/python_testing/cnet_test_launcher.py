@@ -14,7 +14,6 @@ def main():
     ]
 
     args = [
-        "python3", test,
         "--commissioning-method", "ble-wifi",
         "--discriminator", "3840",
         "--passcode", "20202021",
