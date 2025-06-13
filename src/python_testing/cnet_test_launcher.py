@@ -10,7 +10,7 @@ def run_cnet_tests(script_path, args):
 
 def main():
     test_scripts = [
-        "src/python_testing/TC_CNET_4_1.py"
+        "src/python_testing/TC_CNET_1_4.py"
     ]
 
     args = [
