@@ -1,6 +1,6 @@
+import logging as logger
 import subprocess
 import os
-import logging as logger
 
 
 def run_cnet_tests(script_path, args):
