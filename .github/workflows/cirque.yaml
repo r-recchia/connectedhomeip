@@ -107,12 +107,14 @@ jobs:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Build Binaries
+            - name: Build Binaries and Python environment
               run: |
                   integrations/docker/images/stage-2/chip-build-cirque/run.sh \
                     -- sh -c " \
                        git config --global --add safe.directory '*' \
                        && scripts/build/gn_gen_cirque.sh \
+                       && source scripts/activate.sh \
+                       && scripts/build_python.sh -i out/python_env \
                       "
             - name: Run Tests
               run: |
@@ -141,6 +143,7 @@ jobs:
                      --volume /dev/pts:/dev/pts \
                      -- sh -c " \
                        git config --global --add safe.directory '*' \
+                       && source out/python_env/bin/activate \
                        && scripts/tests/cirque_tests.sh run_cnet_tests \
                       "
 
