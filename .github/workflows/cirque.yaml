@@ -114,6 +114,14 @@ jobs:
                        git config --global --add safe.directory '*' \
                        && scripts/build/gn_gen_cirque.sh \
                       "
+            - name: Build Apps
+              run: |
+                  integrations/docker/images/stage-2/chip-build-cirque/run.sh \
+                     --env GITHUB_ACTION_RUN=1 \
+                     -- sh -c " \
+                       git config --global --add safe.directory '*' \
+                       && scripts/run_in_build_env.sh './scripts/build/build_examples.py --target linux-x64-all-clusters build --copy-artifacts-to objdir-clone'
+                      "
             - name: Run Tests
               run: |
                   integrations/docker/images/stage-2/chip-build-cirque/run.sh \
@@ -144,6 +152,7 @@ jobs:
                      --volume /var/run/dbus:/var/run/dbus \
                      -- sh -c " \
                        git config --global --add safe.directory '*' \
+                       && scripts/run_in_build_env.sh 'out/linux-x64-all-clusters/chip-all-clusters-app'
                        && scripts/run_in_python_env.sh out/python_env 'scripts/tests/cirque_tests.sh run_cnet_tests'
                       "
 
