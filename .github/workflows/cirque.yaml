@@ -126,6 +126,7 @@ jobs:
                      -- sh -c " \
                        git config --global --add safe.directory '*' \
                        && scripts/tests/cirque_tests.sh run_all_tests \
+                       && scripts/build_python.sh -i out/python_env \
                       "
 
             - name: Run CNET Tests
@@ -141,10 +142,7 @@ jobs:
                      --volume /dev/pts:/dev/pts \
                      -- sh -c " \
                        git config --global --add safe.directory '*' \
-                       && scripts/build_python.sh -i out/python_env \
-                       && chmod +x out/python_env/bin/activate \
-                       && out/python_env/bin/activate \
-                       && scripts/tests/cirque_tests.sh run_cnet_tests \
+                       && scripts/run_in_python_env.sh out/python_env 'scripts/tests/cirque_tests.sh run_cnet_tests'
                       "
 
             - name: Uploading Binaries
