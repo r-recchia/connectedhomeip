@@ -120,7 +120,7 @@ jobs:
                      --env GITHUB_ACTION_RUN=1 \
                      -- sh -c " \
                        git config --global --add safe.directory '*' \
-                       && scripts/run_in_build_env.sh './scripts/build/build_examples.py --target linux-x64-all-clusters build --copy-artifacts-to objdir-clone'
+                       && scripts/run_in_build_env.sh './scripts/build/build_examples.py --target linux-x64-all-clusters-no-ble build --copy-artifacts-to objdir-clone'
                       "
             - name: Run Tests
               run: |
@@ -145,14 +145,12 @@ jobs:
                      --env LOG_DIR=/tmp/cnet_wifi_output \
                      --env CLEANUP_DOCKER_FOR_CI=1 \
                      --env GITHUB_ACTION_RUN=1 \
-                     --env DBUS_SYSTEM_BUS_ADDRESS=unix:path=/var/run/dbus \
                      --privileged \
                      --volume /tmp:/tmp \
                      --volume /dev/pts:/dev/pts \
-                     --volume /var/run/dbus:/var/run/dbus \
                      -- sh -c " \
                        git config --global --add safe.directory '*' \
-                       && scripts/run_in_build_env.sh 'out/linux-x64-all-clusters/chip-all-clusters-app'
+                       && scripts/run_in_build_env.sh 'out/linux-x64-all-clusters-no-ble/chip-all-clusters-app'
                        && scripts/run_in_python_env.sh out/python_env 'scripts/tests/cirque_tests.sh run_cnet_tests'
                       "
 
