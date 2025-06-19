@@ -150,7 +150,7 @@ jobs:
                      --volume /dev/pts:/dev/pts \
                      -- sh -c " \
                        git config --global --add safe.directory '*' \
-                       && scripts/run_in_build_env.sh 'out/linux-x64-all-clusters-no-ble/chip-all-clusters-app > /tmp/all_clusters.log 2>&1 & \'
+                       && scripts/run_in_build_env.sh 'out/linux-x64-all-clusters-no-ble/chip-all-clusters-app' \
                        && DUT_PID=\$! \
                        && echo 'Started chip-all-clusters-app in background (PID=' \$DUT_PID ')' \
                        && sleep 5 \
