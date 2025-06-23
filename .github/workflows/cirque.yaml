@@ -154,7 +154,7 @@ jobs:
                        && DUT_PID=\$! \
                        && echo 'Started chip-all-clusters-app in background (PID=' \$DUT_PID ')' \
                        && sleep 5 \
-                       && scripts/run_in_python_env.sh out/python_env 'scripts/tests/cirque_tests.sh run_cnet_tests'
+                       && scripts/run_in_python_env.sh out/python_env 'scripts/tests/cirque_tests.sh run_cnet_tests' \
                        && kill \$DUT_PID
                       "
 
@@ -166,3 +166,4 @@ jobs:
                   path: |
                     /tmp/cirque_test_output/
                     /tmp/cnet_wifi_output/
+                    /tmp/all_clusters.log
