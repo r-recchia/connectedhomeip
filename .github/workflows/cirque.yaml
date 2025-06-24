@@ -151,8 +151,8 @@ jobs:
                      -- sh -c " \
                        git config --global --add safe.directory '*' \
                        && apt update \
-                       && apt install -y avahi-daemon dbus\
-                       && dbus-daemon --system & \
+                       && apt install -y avahi-daemon dbus \
+                       && dbus-daemon --system \
                        && avahi-daemon --daemonize --no-drop-root \
                        && scripts/run_in_build_env.sh 'out/linux-x64-all-clusters-no-ble/chip-all-clusters-app > /tmp/all_clusters.log 2 >&1 &' \
                        && DUT_PID=\$! \
