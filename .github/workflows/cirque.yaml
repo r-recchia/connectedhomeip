@@ -153,12 +153,12 @@ jobs:
                        && apt update \
                        && apt install -y avahi-daemon dbus \
                        && mkdir -p /run/dbus \
-                       && dbus-daemon --system \
+                       && dbus-daemon --system --address=unix:path=/run/dbus/system_bus_socket & \
                        && avahi-daemon --daemonize --no-drop-root \
                        && scripts/run_in_build_env.sh 'out/linux-x64-all-clusters-no-ble/chip-all-clusters-app > /tmp/all_clusters.log 2 >&1 &' \
                        && DUT_PID=\$! \
                        && echo 'Started chip-all-clusters-app in background (PID=' \$DUT_PID ')' \
-                       && sleep 5 \
+                       && sleep 10 \
                        && scripts/run_in_python_env.sh out/python_env 'scripts/tests/cirque_tests.sh run_cnet_tests' \
                        && kill \$DUT_PID
                       "
