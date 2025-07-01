@@ -14,7 +14,7 @@ def main():
     ]
 
     args = [
-        "--commissioning-method", "on-network",
+        "--commissioning-method", "ble-wifi",
         "--discriminator", "3840",
         "--passcode", "20202021",
         "--wifi-ssid", os.environ.get("WIFI_SSID", "TestSSID"),
