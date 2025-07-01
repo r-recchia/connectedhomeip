@@ -153,7 +153,7 @@ jobs:
                        && apt update \
                        && apt install -y avahi-daemon dbus \
                        && mkdir -p /run/dbus \
-                       && dbus-daemon --system --address=unix:path=/run/dbus/system_bus_socket & \
+                       && dbus-daemon --system --address=unix:path=/run/dbus/system_bus_socket \
                        && avahi-daemon --daemonize --no-drop-root \
                        && scripts/run_in_build_env.sh 'out/linux-x64-all-clusters-no-ble/chip-all-clusters-app > /tmp/all_clusters.log 2 >&1 &' \
                        && DUT_PID=\$! \
