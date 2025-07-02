@@ -151,7 +151,7 @@ jobs:
                      -- sh -c " \
                        git config --global --add safe.directory '*' \
                        && apt update \
-                       && apt install -y avahi-daemon dbus \
+                       && apt install -y avahi-daemon dbus avahi-utils \
                        && mkdir -p /run/dbus \
                        && dbus-daemon --system --address=unix:path=/run/dbus/system_bus_socket \
                        && avahi-daemon --daemonize --no-drop-root \
