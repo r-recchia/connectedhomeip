@@ -243,6 +243,54 @@ class CHIPVirtualHome:
         self.assertTrue(threadNetworkFormed)
         self.logger.info("Thread network formed")
 
+    def connect_to_wifi_network(self):
+        ssid = os.environ.get("WIFI_SSID", "TestSSID")
+        passphrase = os.environ.get("WIFI_PASSPHRASE", "TestPassword")
+
+        dut = next((d for d in self.non_ap_devices if "all-clusters" in d["type"].lower()), None)
+        if dut is None:
+            self.logger.error("DUT not found with all-clusters-app")
+            raise Exception("DUT not found")
+
+        dut_id = dut["id"]
+
+        self.logger.info(f"Adding Wi-Fi network {ssid} to DUT {self.get_device_pretty_id(dut_id)}")
+
+        add_cmd = (
+            f"chip-tool networkcommissioning add-wifi-network '{ssid}' '{passphrase}' 0 0"
+        )
+
+        connect_cmd = "chip-tool networkcommissioning connect-network 'wifi' 0 0"
+
+        result_add = self.execute_device_cmd(dut_id, add_cmd)
+        if result_add["return_code"] != "0":
+            self.logger.error(f"Failed to add Wi-Fi network: {result_add['output']}")
+            raise Exception("Failed to add Wi-Fi network")
+
+        self.logger.info("Wi-Fi network added. Trying to connect...")
+
+        result_conn = self.execute_device_cmd(dut_id, connect_cmd)
+        if result_conn["return_code"] != "0":
+            self.logger.error(f"Failed to connect to Wi-Fi network: {result_conn['output']}")
+            raise Exception("Failed to connect to Wi-Fi network")
+
+        self.logger.info("Wi-Fi connection successfully send. Waiting for IP...")
+        self.wait_for_wifi_ip(dut_id)
+
+    def wait_for_wifi_ip(self, device_id, timeout=15):
+        self.logger.info(f"Waiting IP Wi-Fi for {self.get_device_pretty_id(device_id)}")
+        start = time.time()
+        while time.time() - start < timeout:
+            result = self.execute_device_cmd(device_id, "ip -4 addr show wlan0")
+            lines = result["output"].splitlines()
+            for line in lines:
+                line = line.strip()
+                if line.startswith("inet "):
+                    self.logger.info(f"Device {device_id} has IP Wi-Fi: {line}")
+                    return
+            time.sleep(1)
+        raise Exception(f"Timeout waiting IP in wlan0 for {device_id}")
+
     def enable_wifi_on_device(self):
         ssid, psk = self.query_api('wifi_ssid_psk', [self.home_id])
 
