@@ -38,6 +38,7 @@ class CNETTests(CHIPVirtualHome):
 
 
 def main():
+
     commissioning_method = "ble-wifi"
     test_scripts = [
         "src/python_testing/TC_CNET_1_4.py"
