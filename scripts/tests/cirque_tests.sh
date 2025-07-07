@@ -117,7 +117,7 @@ function cirquetest_cachekeyhash() {
 
 function cirquetest_run_cnet_tests() {
     echo "Running CNET tests"
-    python3 src/test_driver/linux-cirque/cnet_test_launcher.py
+    python3 src/python_testings/cnet_test_launcher.py
 }
 
 function cirquetest_bootstrap() {
