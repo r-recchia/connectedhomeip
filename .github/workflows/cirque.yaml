@@ -159,7 +159,6 @@ jobs:
                        && DUT_PID=\$! \
                        && echo 'Started chip-all-clusters-app in background (PID=' $DUT_PID ')' \
                        && sleep 30 \
-                       && pip3 install requests \
                        && scripts/run_in_python_env.sh out/python_env 'scripts/tests/cirque_tests.sh run_cnet_tests' \
                        && kill \$DUT_PID
                       "
