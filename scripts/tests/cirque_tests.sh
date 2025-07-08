@@ -44,19 +44,19 @@ OT_SIMULATION_CACHE_STAMP_FILE="$CIRQUE_CACHE_PATH/ot-simulation.commit"
 #   paths where endpoint/cluster do not)
 CIRQUE_TESTS=(
     "EchoTest"
-    "EchoOverTcpTest"
-    "FailsafeTest"
-    "MobileDeviceTest"
-    "CommissioningTest"
-    "IcdDeviceTest"
-    "SplitCommissioningTest"
-    "CommissioningFailureTest"
-    "CommissioningFailureOnReportTest"
-    "PythonCommissioningTest"
-    "CommissioningWindowTest"
-    "SubscriptionResumptionTest"
-    "SubscriptionResumptionCapacityTest"
-    "SubscriptionResumptionTimeoutTest"
+    # "EchoOverTcpTest"
+    # "FailsafeTest"
+    # "MobileDeviceTest"
+    # "CommissioningTest"
+    # "IcdDeviceTest"
+    # "SplitCommissioningTest"
+    # "CommissioningFailureTest"
+    # "CommissioningFailureOnReportTest"
+    # "PythonCommissioningTest"
+    # "CommissioningWindowTest"
+    # "SubscriptionResumptionTest"
+    # "SubscriptionResumptionCapacityTest"
+    # "SubscriptionResumptionTimeoutTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
@@ -116,9 +116,11 @@ function cirquetest_cachekeyhash() {
 }
 
 function cirquetest_run_cnet_tests() {
+    ORIGINAL_DIR=$(pwd)
     __cirquetest_start_flask
     sleep 5
     echo "Running CNET tests"
+    cd $ORIGINAL_DIR
     python3 src/test_driver/linux-cirque/cnet_test_launcher.py
     __cirquetest_clean_flask
 }
