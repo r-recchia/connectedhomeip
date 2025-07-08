@@ -116,8 +116,11 @@ function cirquetest_cachekeyhash() {
 }
 
 function cirquetest_run_cnet_tests() {
+    __cirquetest_start_flask
+    sleep 5
     echo "Running CNET tests"
     python3 src/test_driver/linux-cirque/cnet_test_launcher.py
+    __cirquetest_clean_flask
 }
 
 function cirquetest_bootstrap() {
