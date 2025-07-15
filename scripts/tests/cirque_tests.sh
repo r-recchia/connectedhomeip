@@ -119,10 +119,12 @@ function cirquetest_run_cnet_tests() {
     ORIGINAL_DIR=$(pwd)
     __cirquetest_start_flask
     sleep 5
+    echo "Install requests"
+    pip3 install requests
     echo "Running CNET tests"
     cd $ORIGINAL_DIR
     # python3 src/test_driver/linux-cirque/cnet_test_launcher.py
-    CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" "src/python_testing/cnet_test_launcher.py" "$@"
+    CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" "python3 src/python_testing/cnet_test_launcher.py" "$@"
     exitcode=$?
     __cirquetest_clean_flask
 }
@@ -208,12 +210,12 @@ subcommand=$1
 shift
 
 case $subcommand in
-*)
-    cirquetest_"$subcommand" "$@"
-    exitcode=$?
-    if ((exitcode == 127)); then
-        echo "Unknown command: $subcommand" >&2
-    fi
-    exit "$exitcode"
-    ;;
+    *)
+        cirquetest_"$subcommand" "$@"
+        exitcode=$?
+        if ((exitcode == 127)); then
+            echo "Unknown command: $subcommand" >&2
+        fi
+        exit "$exitcode"
+        ;;
 esac
