@@ -122,7 +122,11 @@ function cirquetest_run_cnet_tests() {
     echo "Install requests"
     pip3 install requests
     echo "Running CNET tests"
+    pwd
+    ls
     cd $ORIGINAL_DIR
+    pwd
+    ls
     # python3 src/test_driver/linux-cirque/cnet_test_launcher.py
     CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" "python3 "$REPO_DIR"src/python_testing/cnet_test_launcher.py" "$@"
     exitcode=$?
