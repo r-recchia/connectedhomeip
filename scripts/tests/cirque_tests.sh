@@ -117,17 +117,29 @@ function cirquetest_cachekeyhash() {
 
 function cirquetest_run_cnet_tests() {
     ORIGINAL_DIR=$(pwd)
+
     __cirquetest_start_flask
-    sleep 5
+
+    sleep 30
+
+    echo "Check flask server is up"
+    for i in {1..10}; do
+        if curl -s http://localhost:5000/healthcheck; then
+            break
+        fi
+        sleep 1
+    done
+
     echo "Install requests"
     pip3 install requests
-    echo "Running CNET tests"
-    pwd
+
     cd $ORIGINAL_DIR
-    pwd
+
+    echo "Running CNET tests"
     python3 src/python_testing/cnet_test_launcher.py
     # CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" "python3 src/python_testing/cnet_test_launcher.py" "$@"
     # exitcode=$?
+
     __cirquetest_clean_flask
 }
 
