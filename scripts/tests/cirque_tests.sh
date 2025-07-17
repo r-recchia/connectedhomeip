@@ -125,9 +125,9 @@ function cirquetest_run_cnet_tests() {
     pwd
     cd $ORIGINAL_DIR
     pwd
-    # python3 src/test_driver/linux-cirque/cnet_test_launcher.py
-    CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" "python3 src/python_testing/cnet_test_launcher.py" "$@"
-    exitcode=$?
+    python3 src/python_testing/cnet_test_launcher.py
+    # CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" "python3 src/python_testing/cnet_test_launcher.py" "$@"
+    # exitcode=$?
     __cirquetest_clean_flask
 }
 
