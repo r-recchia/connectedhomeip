@@ -124,7 +124,7 @@ function cirquetest_run_cnet_tests() {
 
     echo "Check flask server is up"
     for i in {1..10}; do
-        if curl -s http://localhost:5000/healthcheck; then
+        if curl -s http://localhost:5000; then
             break
         fi
         sleep 1
