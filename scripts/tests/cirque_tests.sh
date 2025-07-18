@@ -64,6 +64,55 @@ BOLD_YELLOW_TEXT="\033[1;33m"
 BOLD_RED_TEXT="\033[1;31m"
 RESET_COLOR="\033[0m"
 
+function start_flask_for_cnet() {
+    echo "Start Flask server for CNET tests..."
+
+    export FLASK_PORT=5000
+    export FLASK_LOG_DIR="/tmp/cnet_flask_logs"
+    export FLASK_LOG="$FLASK_LOG_DIR/flask.log"
+
+    mkdir -p "$FLASK_LOG_DIR"
+
+    cd "$REPO_DIR/third_party/cirque/repo/build/simulation/examples/apps/ncp" || exit 1
+    FLASK_APP="$REPO_DIR/third_party/cirque/repo/cirque/restservice/service.py" \
+        python3 -m flask run --port=$FLASK_PORT >"$FLASK_LOG" 2>&1 &
+
+    export FLASK_PID=$!
+    echo "Flask started with PID $FLASK_PID. Waiting it to be ready..."
+
+    for i in {1..10}; do
+        if curl -s --max-time 1 http://localhost:$FLASK_PORT/ >/dev/null; then
+            echo "Flask is up"
+            return 0
+        fi
+        echo "Waiting for flask ($i)..."
+        sleep 1
+    done
+
+    echo "Flask did not start. Check log: "
+    cat "$FLASK_LOG"
+    return 1
+}
+
+function stop_flask_for_cnet() {
+    echo "Stopping flask..."
+
+    if [ -n "$FLASK_PID" ]; then
+        kill -SIGTERM "$FLASK_PID"
+        wait "$FLASK_PID" 2>/dev/null
+        echo "Flask stopped (PID $FLASK_PID)"
+    else
+        echo "No PID found"
+    fi
+
+    if [ -f "$FLASK_LOG" ]; then
+        echo "Flask log content: "
+        cat "$FLASK_LOG"
+    else
+        echo "No log found ad $FLASK_LOG"
+    fi
+}
+
 function __cirquetest_start_flask() {
     echo 'Start Flask'
     cd "$REPO_DIR"/third_party/cirque/repo
@@ -118,19 +167,9 @@ function cirquetest_cachekeyhash() {
 function cirquetest_run_cnet_tests() {
     ORIGINAL_DIR=$(pwd)
 
-    __cirquetest_start_flask
+    start_flask_for_cnet
 
-    sleep 30
-
-    echo "Check flask server is up"
-    for i in {1..10}; do
-        if nc -z http://localhost:5000; then
-            echo "Flask is ip"
-            break
-        fi
-        echo "Waiting flask"
-        sleep 1
-    done
+    sleep 5
 
     echo "Install requests"
     pip3 install requests
@@ -142,7 +181,7 @@ function cirquetest_run_cnet_tests() {
     # CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" "python3 src/python_testing/cnet_test_launcher.py" "$@"
     # exitcode=$?
 
-    __cirquetest_clean_flask
+    stop_flask_for_cnet
 }
 
 function cirquetest_bootstrap() {
