@@ -67,15 +67,13 @@ RESET_COLOR="\033[0m"
 function start_flask_for_cnet() {
     echo "Start Flask server for CNET tests..."
 
-    export FLASK_PORT=5000
-    export FLASK_LOG_DIR="/tmp/cnet_flask_logs"
-    export FLASK_LOG="$FLASK_LOG_DIR/flask.log"
+    cd "$REPO_DIR/third_party/cirque/repo"
+    export FLASK_LOG="$LOG_DIR/$CURRENT_TEST/flask.log"
+    mkdir -p "$(dirname "$FLASK_LOG")"
 
-    mkdir -p "$FLASK_LOG_DIR"
-
-    cd "$REPO_DIR/third_party/cirque/repo/build/simulation/examples/apps/ncp" || exit 1
-    FLASK_APP="$REPO_DIR/third_party/cirque/repo/cirque/restservice/service.py" \
-        python3 -m flask run --port=$FLASK_PORT >"$FLASK_LOG" 2>&1 &
+    setsid bash -c '
+        export FLASK_APP=cirque/restservice/service.py
+        python3 -m flask run >"'"$FLASK_LOG"'"/flask.log 2>&1' &
 
     export FLASK_PID=$!
     echo "Flask started with PID $FLASK_PID. Waiting it to be ready..."
