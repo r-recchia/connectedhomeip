@@ -68,12 +68,12 @@ function start_flask_for_cnet() {
     echo "Start Flask server for CNET tests..."
 
     cd "$REPO_DIR/third_party/cirque/repo"
-    export FLASK_LOG="$LOG_DIR/$CURRENT_TEST/flask.log"
+    export FLASK_LOG="$LOG_DIR/$CURRENT_TEST" + "flask.log"
     mkdir -p "$(dirname "$FLASK_LOG")"
 
     setsid bash -c '
         export FLASK_APP=cirque/restservice/service.py
-        python3 -m flask run >"'"$FLASK_LOG"'"/flask.log 2>&1' &
+        python3 -m flask run >"'"$FLASK_LOG"'" 2>&1' &
 
     export FLASK_PID=$!
     echo "Flask started with PID $FLASK_PID. Waiting it to be ready..."
