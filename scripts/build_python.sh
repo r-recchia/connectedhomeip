@@ -194,7 +194,7 @@ if [[ -n $wifi_paf_config ]]; then
 fi
 echo "  enable_ipv4=\"$enable_ipv4\""
 echo "  chip_build_controller_dynamic_server=\"$chip_build_controller_dynamic_server\""
-echo "  chip_support_webrtc_python_bindings=falseß"
+echo "  chip_support_webrtc_python_bindings=false"
 
 if [[ ${#extra_gn_args[@]} -gt 0 ]]; then
     echo "In addition, the following extra args will added to gn command line: ${extra_gn_args[*]}"
