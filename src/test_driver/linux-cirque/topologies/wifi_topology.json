@@ -1,0 +1,14 @@
+{
+    "nodes": [
+        {
+            "type": "wifi-ap",
+            "name": "ap1",
+            "ssid": "TestSSID",
+            "password": "TestPassword"
+        },
+        {
+            "type": "linux",
+            "name": "dut"
+        }
+    ]
+}

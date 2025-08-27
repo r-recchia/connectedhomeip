@@ -1,19 +1,7 @@
-# Lint as: python3
-"""
-Copyright (c) 2020 Project CHIP Authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
+import logging
+import os
+import subprocess
+import sys
 
 import ipaddress
 import json
@@ -28,21 +16,10 @@ from urllib.parse import urljoin
 
 import requests
 
-
 class TestResult(IntEnum):
     OK = 0
     TEST_FAILURE = 1
     SYSTEM_FAILURE = 2
-
-
-'''
-CHIPVirtualHome is a base class for single home tests
-child classes should implement:
-- setup()
-- test_routine()
-- tear_down()
-'''
-
 
 class CHIPVirtualHome:
     def __init__(self, cirque_url, device_config: Mapping[str, dict]):
@@ -473,3 +450,72 @@ class CHIPVirtualHome:
     @property
     def default_base_image(cls):
         return os.environ.get("CHIP_CIRQUE_BASE_IMAGE", "project-chip/chip-cirque-device-base")
+
+
+logger = logging.getLogger("CNETTestLauncher")
+logging.basicConfig(level=logging.INFO)
+
+
+class CNETTests(CHIPVirtualHome):
+    def __init__(self, commissioning_method):
+        super().__init__("http://localhost:5000", device_config={
+            "device0": {
+                "type": "CHIP-DUT",
+                "base_image": "@default",
+                "compatibility": {"Interactive": True}
+            },
+            "device1": {
+                "type": "CHIP-TH",
+                "base_image": "@default",
+                "compatibility": {"Interactive": True}
+            }
+        })
+        self.commissioning_method = commissioning_method
+
+    def setup(self):
+        self.initialize_home()
+
+        if self.commissioning_method == "on-network":
+            logger.info("Connecting DUT to Wi-Fi before running tests")
+            self.connect_to_wifi_network()
+
+    def run_cnet_tests(self, script_path, args):
+        logger.info(f"Running {script_path} with args: {args}")
+        subprocess.run(["python3", script_path] + args, check=True)
+
+
+def main():
+
+    commissioning_method = "ble-wifi"
+    test_scripts = [
+        "src/python_testing/TC_CNET_1_4.py"
+    ]
+
+    args = [
+        "--commissioning-method", commissioning_method,
+        "--discriminator", "3840",
+        "--passcode", "20202021",
+        "--wifi-ssid", os.environ.get("WIFI_SSID", "TestSSID"),
+        "--wifi-passphrase", os.environ.get("WIFI_PASSPHRASE", "TestPassword")
+    ]
+
+    try:
+        cnet = CNETTests(commissioning_method)
+        cnet.setup()
+
+        for test in test_scripts:
+            cnet.run_cnet_tests(test, args)
+
+        sys.exit(0)
+
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Test script failed: {e}")
+        sys.exit(1)
+
+    except Exception as ex:
+        logger.exception("Unexpected failure occured.")
+        sys.exit(2)
+
+
+if __name__ == "__main__":
+    main()

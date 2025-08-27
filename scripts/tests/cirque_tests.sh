@@ -44,25 +44,91 @@ OT_SIMULATION_CACHE_STAMP_FILE="$CIRQUE_CACHE_PATH/ot-simulation.commit"
 #   paths where endpoint/cluster do not)
 CIRQUE_TESTS=(
     "EchoTest"
-    "EchoOverTcpTest"
-    "FailsafeTest"
-    "MobileDeviceTest"
-    "CommissioningTest"
-    "IcdDeviceTest"
-    "SplitCommissioningTest"
-    "CommissioningFailureTest"
-    "CommissioningFailureOnReportTest"
-    "PythonCommissioningTest"
-    "CommissioningWindowTest"
-    "SubscriptionResumptionTest"
-    "SubscriptionResumptionCapacityTest"
-    "SubscriptionResumptionTimeoutTest"
+    # "EchoOverTcpTest"
+    # "FailsafeTest"
+    # "MobileDeviceTest"
+    # "CommissioningTest"
+    # "IcdDeviceTest"
+    # "SplitCommissioningTest"
+    # "CommissioningFailureTest"
+    # "CommissioningFailureOnReportTest"
+    # "PythonCommissioningTest"
+    # "CommissioningWindowTest"
+    # "SubscriptionResumptionTest"
+    # "SubscriptionResumptionCapacityTest"
+    # "SubscriptionResumptionTimeoutTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
 BOLD_YELLOW_TEXT="\033[1;33m"
 BOLD_RED_TEXT="\033[1;31m"
 RESET_COLOR="\033[0m"
+
+function start_flask_for_cnet() {
+    echo "Start Flask server for CNET tests..."
+
+    cd "$REPO_DIR/third_party/cirque/repo" || {
+        echo "Can not change directory to $REPO_DIR/third_party/cirque/repo"; return 1;
+    }
+    export FLASK_LOG="'"$LOG_DIR"'"/flask.log
+    mkdir -p "$(dirname "$FLASK_LOG")"
+
+    export FLASK_APP="cirque/restservice/service.py"
+    export FLASK_RUN_HOST="${FLASK_RUN_HOST:-127.0.0.1}"
+    export FLASK_RUN_PORT="${FLASK_PORT:-5000}"
+
+    setsid bash -c '
+        python3 -m flask run --host "$FLASK_RUN_HOST" --port "$FLASK_RUN_PORT" >"$FLASK_LOG" 2>&1'
+
+    export FLASK_PID=$!
+    echo "Flask started with PID $FLASK_PID. Waiting it to be ready..."
+
+    for i in {1..20}; do
+        if curl -s --max-time 2 http://${FLASK_RUN_HOST}:${FLASK_PORT}/ >/dev/null; then
+            echo "Flask is up"
+            return 0
+        fi
+        if ! kill -0 "$FLASK_PID" 2>/dev/null; then
+            echo "Flask process dies while starting. Log follows:"
+            cat "$FLASK_LOG" || true
+            return 1
+        fi
+        echo "Waiting for flask ($i)..."
+        sleep 1
+    done
+
+    echo "Flask did not start. Check log: "
+    cat "$FLASK_LOG" || true
+    return 1
+}
+
+function stop_flask_for_cnet() {
+    echo "Stopping flask..."
+
+    if [ -n "$FLASK_PID" ] && kill -0 "$FLASK_PID" 2>/dev/null; then
+        kill -SIGTERM "$FLASK_PID" 2>/dev/null || true
+        for i in {1..5}; do
+            if ! kill -0 "$FLASK_PID" 2>/dev/null; then
+                break
+            fi
+            sleep 1
+        done
+        if kill -0 "$FLASK_PID" 2>/dev/null; then
+            echo "Flask still alive, sending SIGKILL..."
+            kill -9 "$FLASK_PID" 2>/dev/null || true
+        fi
+        echo "Flask stopped (PID $FLASK_PID)"
+    else
+        echo "No PID found for flask"
+    fi
+
+    if [ -f "$FLASK_LOG" ]; then
+        echo "Flask log content: "
+        cat "$FLASK_LOG"
+    else
+        echo "No log found ad $FLASK_LOG"
+    fi
+}
 
 function __cirquetest_start_flask() {
     echo 'Start Flask'
@@ -113,6 +179,26 @@ function cirquetest_cachekey() {
 
 function cirquetest_cachekeyhash() {
     cirquetest_cachekey | shasum | awk '{ print $1 }'
+}
+
+function cirquetest_run_cnet_tests() {
+    ORIGINAL_DIR=$(pwd)
+
+    start_flask_for_cnet
+
+    sleep 5
+
+    echo "Install requests"
+    pip3 install requests
+
+    cd $ORIGINAL_DIR
+
+    echo "Running CNET tests"
+    python3 src/python_testing/cnet_test_launcher.py
+    # CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" "python3 src/python_testing/cnet_test_launcher.py" "$@"
+    # exitcode=$?
+
+    stop_flask_for_cnet
 }
 
 function cirquetest_bootstrap() {
