@@ -627,7 +627,6 @@ class TC_CNET_4_23(MatterBaseTest):
         logger.info(" --- CommissioningComplete command sent successfully, commissioning finalized.")
 
         # --- CASE PHASE (post-commissioning) ---
-
         if correct_ssid_case is None or correct_password_case is None:
             logger.info("Cannot test CASE phase because of missing arguments")
             self.mark_all_remaining_steps_skipped(17)
@@ -716,7 +715,7 @@ class TC_CNET_4_23(MatterBaseTest):
             expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kSuccess
         )
 
-        # (Opcional) disarm failsafe
+        # Disarm failsafe
         logger.info(" --- CASE phase: disarming failsafe")
         await self.send_single_cmd(
             endpoint=endpoint,
